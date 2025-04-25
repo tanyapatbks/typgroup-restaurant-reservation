@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const UserSchema = new mongoose.Schema({
+    // Schema definition remains the same
     name: {
         type: String,
         required: [true, 'Please add a name']
@@ -33,7 +34,7 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
-// Encrypt password using bcrypt
+// Middleware and methods remain the same
 UserSchema.pre('save', async function(next) {
     if (!this.isModified('password')) {
         next();
@@ -43,7 +44,6 @@ UserSchema.pre('save', async function(next) {
     this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Sign JWT and return
 UserSchema.methods.getSignedJwtToken = function() {
     return jwt.sign(
         { id: this._id },
@@ -52,9 +52,9 @@ UserSchema.methods.getSignedJwtToken = function() {
     );
 };
 
-// Match user entered password to hashed password in database
 UserSchema.methods.matchPassword = async function(enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model('User', UserSchema);
+// Check if model exists before creating
+module.exports = mongoose.models.User || mongoose.model('User', UserSchema);

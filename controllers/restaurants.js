@@ -1,5 +1,21 @@
 const Restaurant = require('../models/Restaurant');
 
+// Create new restaurant
+exports.createRestaurant = async (req, res, next) => {
+    try {
+        const restaurant = await Restaurant.create(req.body);
+        res.status(201).json({
+            success: true,
+            data: restaurant
+        });
+    } catch (err) {
+        res.status(400).json({
+            success: false,
+            error: err.message
+        });
+    }
+};
+
 // Get all restaurants
 exports.getRestaurants = async (req, res, next) => {
     try {
@@ -30,22 +46,6 @@ exports.getRestaurant = async (req, res, next) => {
         res.status(200).json({ success: true, data: restaurant });
     } catch (err) {
         res.status(400).json({ success: false, error: err.message });
-    }
-};
-
-// Create new restaurant
-exports.createRestaurant = async (req, res, next) => {
-    try {
-        const restaurant = await Restaurant.create(req.body);
-        res.status(201).json({
-            success: true,
-            data: restaurant
-        });
-    } catch (err) {
-        res.status(400).json({
-            success: false,
-            error: err.message
-        });
     }
 };
 

@@ -1,60 +1,49 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
-const UserSchema = new mongoose.Schema({
+const RestaurantSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, 'Please add a name']
+        required: [true, 'Please add a name'],
+        unique: true
+    },
+    address: {
+        type: String,
+        required: [true, 'Please add an address']
     },
     telephone: {
         type: String,
         required: [true, 'Please add a telephone number']
     },
-    email: {
+    openTime: {
         type: String,
-        required: [true, 'Please add an email'],
-        unique: true
+        required: [true, 'Please add opening time']
     },
-    role: {
+    closeTime: {
         type: String,
-        enum: ['user', 'admin'],
-        default: 'user'
-    },
-    password: {
-        type: String,
-        required: [true, 'Please add a password'],
-        minlength: 6,
-        select: false
+        required: [true, 'Please add closing time']
     },
     createdAt: {
         type: Date,
         default: Date.now
     }
+}, {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
 
-// Encrypt password using bcrypt
-UserSchema.pre('save', async function(next) {
-    if (!this.isModified('password')) {
-        next();
-    }
-    
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+// Reverse populate with virtuals
+RestaurantSchema.virtual('reservations', {
+    ref: 'Reservation',
+    localField: '_id',
+    foreignField: 'restaurant',
+    justOne: false
 });
 
-// Sign JWT and return
-UserSchema.methods.getSignedJwtToken = function() {
-    return jwt.sign(
-        { id: this._id },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRE }
-    );
-};
+// Cascade delete reservations when a restaurant is deleted
+RestaurantSchema.pre('deleteOne', { document: true, query: false }, async function(next) {
+    console.log(`Reservations being removed from restaurant ${this._id}`);
+    await this.model('Reservation').deleteMany({ restaurant: this._id });
+    next();
+});
 
-// Match user entered password to hashed password in database
-UserSchema.methods.matchPassword = async function(enteredPassword) {
-    return await bcrypt.compare(enteredPassword, this.password);
-};
-
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('Restaurant', RestaurantSchema);
