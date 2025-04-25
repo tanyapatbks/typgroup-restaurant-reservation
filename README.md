@@ -1,43 +1,6 @@
 # Restaurant Reservation API
 
-A simple REST API for managing restaurant reservations based on the requirements provided.
-
-## Features
-
-- User registration and authentication
-- Restaurant management (admin only)
-- Table reservation system (max 3 reservations per user)
-- User and admin reservation management
-
-## Setup Instructions
-
-### Prerequisites
-
-- Node.js (v14+)
-- MongoDB installed locally or MongoDB Atlas account
-
-### Installation
-
-1. Clone the repository:
-```
-git clone <repository-url>
-cd restaurant-reservation
-```
-
-2. Install dependencies:
-```
-npm install
-```
-
-3. Set up environment variables:
-- Edit the `config/config.env` file with your MongoDB connection string and JWT secret
-
-4. Start the server:
-```
-npm run dev
-```
-
-The server will run on http://localhost:5000
+The server will run on http://localhost:5003
 
 ## API Endpoints
 
